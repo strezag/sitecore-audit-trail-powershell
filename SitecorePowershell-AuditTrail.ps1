@@ -6,7 +6,7 @@ function Get-Audit () {
     $resolvedPath = Resolve-Path -Path $logsFolder
     
     # Get all log files, then filter out everything that doesn't matter. Sort by LastWriteTime descending. 
-    $files = Get-ChildItem $resolvedPath | Where-Object {  $_.Name -notmatch "Fxm" -and $_.Name -NotMatch "Search" -and $_.Name -NotMatch "WebDAV" -and $_.Name -NotMatch "Crawling" -and $_.Name -NotMatch "Publishing" } | Sort-Object LastWriteTime -Descending 
+    $files = Get-ChildItem $resolvedPath | Where-Object {  $_.Name -notmatch "Fxm" -and $_.Name -NotMatch "Search" -and $_.Name -NotMatch "WebDAV" -and $_.Name -NotMatch "client" -and $_.Name -NotMatch "Crawling" -and $_.Name -NotMatch "Publishing" -and $_.Name -NotMatch "spe" -and $_.Name -NotMatch "custom"  } | Sort-Object LastWriteTime -Descending 
     
     # Confirm the user has provided start and end dates. 
     if ($selectedEndDate -ne "01/01/0001 00:00:00" -and $selectedStartDate.Year -ne "01/01/0001 00:00:00") {
@@ -49,6 +49,9 @@ function Get-Audit () {
                 
                 # Remove double spaces from the line.
                 $saitizedLogLine = $logLine.Replace("  ", " ")
+
+                # In some cases, the audit line will contain ManagedPoolThread #XX instead of an ID.  This accounts for this scenario
+                $saitizedLogLine = $saitizedLogLine -Replace "(((ManagedPoolThread)\s\#[^\s]+)\s)", "0 "
                 
                 # Split the line by spaces and create new objects for each property.
                 $date, $apid, $time, $loglevel, $logcode, $username, $action = $saitizedLogLine.split(" ")
@@ -77,8 +80,8 @@ function Get-Audit () {
 # Define the dialog properties.  We'll need a start date and end date input from the user.
 $dialogProps = @{
     Parameters  = @(
-        @{Name = "selectedStartDate"; Title = "Start Date"; Editor = "date time"; Tooltip = "(How recent?)"},
-        @{Name = "selectedEndDate"; Title = "End Date"; Editor = "date time"; Tooltip = "(How far back?)"}
+        @{Name = "selectedStartDate"; Title = "Closest Date"; Editor = "date time"; Tooltip = "(How recent?)"},
+        @{Name = "selectedEndDate"; Title = "Furthest Date"; Editor = "date time"; Tooltip = "(How far back?)"}
     )
     Title       = "Date Filter"
     Description = "Select a date range to filter the audit."
