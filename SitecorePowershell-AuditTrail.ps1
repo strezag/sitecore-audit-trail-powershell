@@ -18,7 +18,7 @@ function Get-Audit () {
     else {
         
         # If a user chose to not select a date range, use the original file list, but limit the process to the most recent 25 files.
-        $filteredFiles = $files | Select-Object -First 25
+        $filteredFiles = $files | Select-Object -First 5
         
     }
     
