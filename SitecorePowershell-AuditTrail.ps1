@@ -1,12 +1,13 @@
 function Get-Audit () {
+
+    # UPDATE: We'll use $SitecoreLogFolder instead. SPE creates a variable $SitecoreLogFolder and resolves the path for you.
     # Identify the Sitecore log folder
-    $logsFolder = [Sitecore.Configuration.Settings]::LogFolder
-    
+    # $logsFolder = [Sitecore.Configuration.Settings]::LogFolder
     # Resolve the log folder's path
-    $resolvedPath = Resolve-Path -Path $logsFolder
+    # $resolvedPath = Resolve-Path -Path $logsFolder
     
     # Get all log files, then filter out everything that doesn't matter. Sort by LastWriteTime descending. 
-    $files = Get-ChildItem $resolvedPath | Where-Object {  $_.Name -notmatch "Fxm" -and $_.Name -NotMatch "Search" -and $_.Name -NotMatch "WebDAV" -and $_.Name -NotMatch "client" -and $_.Name -NotMatch "Crawling" -and $_.Name -NotMatch "Publishing" -and $_.Name -NotMatch "spe" -and $_.Name -NotMatch "custom"  } | Sort-Object LastWriteTime -Descending 
+    $files = Get-ChildItem $SitecoreLogFolder | Where-Object {  $_.Name -notmatch "Fxm" -and $_.Name -NotMatch "Search" -and $_.Name -NotMatch "WebDAV" -and $_.Name -NotMatch "client" -and $_.Name -NotMatch "Crawling" -and $_.Name -NotMatch "Publishing" -and $_.Name -NotMatch "spe" -and $_.Name -NotMatch "custom"  } | Sort-Object LastWriteTime -Descending 
     
     # Confirm the user has provided start and end dates. 
     if ($selectedEndDate -ne "01/01/0001 00:00:00" -and $selectedStartDate.Year -ne "01/01/0001 00:00:00") {
